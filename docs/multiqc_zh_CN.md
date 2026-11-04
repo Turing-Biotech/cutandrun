@@ -1,6 +1,7 @@
 # MultiQC 简体中文报告（zh_CN）
 
-这个分支在英文流水线之上加了一层简体中文 MultiQC 报告。整层只由三个新文件组成，
+这个分支在英文流水线之上加了一层简体中文 MultiQC 报告。整层只由三个新文件组成
+（本文档是分支上的第四个新增文件，仅作使用说明，不参与报告生成），
 没有改动任何上游（nf-core/cutandrun）文件，也没有改 `nextflow.config`、工作流或
 模块。不传激活配置时，报告与原版完全一致。
 
@@ -116,9 +117,10 @@ nextflow run . -profile docker --multiqc_config assets/multiqc_config_zh_CN.yml
 ## English summary (for maintainers)
 
 This branch adds a Simplified-Chinese MultiQC report as a purely additive
-layer on this fork of nf-core/cutandrun. Three new files, zero changes to
-upstream-tracked files, so rebasing or merging upstream `master` later stays
-conflict-free: `assets/multiqc_config_zh_CN.yml` is a full copy of
+layer on this fork of nf-core/cutandrun. The report layer is three new files
+(this document is a fourth, doc-only file), zero changes to upstream-tracked
+files, so rebasing or merging upstream `master` later stays conflict-free:
+`assets/multiqc_config_zh_CN.yml` is a full copy of
 `assets/multiqc_config.yml` with 12 display strings translated (report title,
 footer, module names and descriptions, one section comment);
 `conf/multiqc_zh_CN.config` points `params.multiqc_config` at it, which the

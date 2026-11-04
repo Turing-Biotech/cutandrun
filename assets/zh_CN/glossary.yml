@@ -221,7 +221,8 @@ report_strings:
 #   - MultiQC 段落锚点、绘图标识符、plot id
 #   - fn/sp 搜索模式与正则（sp.*、extra_fn_clean_trim）
 #   - run_modules / module_order / report_section_order / custom_content 的键名
-#   - 模块内部小节标题与表格列名（MultiQC 代码硬编码，config 无法覆盖）
+#   - 模块内部 h3 小节标题（MultiQC 代码硬编码，config 无法覆盖）；
+#     General Stats 列名技术上可用 table_columns_name 覆写（设计稿 §6.1 实测），v1 不启用
 #   - assets/multiqc/*.txt 自定义表头（上游追踪文件，workflow 路径硬编码，
 #     含 "Peak QC"、"Sample FRiP score"、"Fragment Length Distribution" 等）
 never_translate:
@@ -231,5 +232,5 @@ never_translate:
   - "section anchors, plot ids, plot identifiers"
   - "fn/sp search patterns and regular expressions"
   - "run_modules / module_order / report_section_order / custom_content keys"
-  - "module-internal section headings and table column headers (hard-coded in MultiQC)"
+  - "module-internal h3 section headings (hard-coded in MultiQC; General Stats column names are overridable via table_columns_name, v2 path, not enabled in v1)"
   - "assets/multiqc/*.txt custom table headers (upstream-tracked, workflow-hardcoded paths)"
