@@ -10,11 +10,20 @@
 | `conf/multiqc_zh_CN.config` | 激活配置。把 `params.multiqc_config` 指向上面的 zh 配置 |
 | `assets/zh_CN/glossary.yml` | 术语表。每条被翻译的字符串逐字固定，并列出永不翻译的词 |
 
-原理：流水线本来就会把 `assets/multiqc_config.yml` 传给 MultiQC；
-`params.multiqc_config` 会再让 MULTIQC 进程在默认配置之后追加一个
-`--config`（见 `workflows/cutandrun.nf` 和 `modules/local/multiqc.nf`）。
-MultiQC 按加载顺序覆盖同名键，所以中文层只在默认英文配置之上替换
-翻译范围内的显示文本，其余键原样保留。
+原理：MULTIQC 进程的命令行为 `multiqc -f [--config <params.multiqc_config>] .`
+（`modules/local/multiqc.nf` L46-48：只有 `params.multiqc_config` 非空时才追加
+`--config`）。上游 master 里 `assets/multiqc_config.yml` 只是作为进程输入被
+stage 进来（`workflows/cutandrun.nf` L70/L922），并不写进命令行。因此：
+
+- 不传激活配置 → 命令行为 `multiqc -f .`，报告与现有流水线行为完全一致；
+- 传激活配置 → 命令行收到
+  `--config $projectDir/assets/multiqc_config_zh_CN.yml`。
+
+zh 配置是基础配置的完整拷贝（除 12 处翻译过的显示字符串和新增的 `title`
+键外逐字相同），所以它给出的报告结构与上游预期一致：同样的 `run_modules`、
+`custom_content` 与章节顺序。若将来基础配置也被传进命令行（上游改动或
+用户 `-args`），MultiQC 按加载顺序让后加载的配置覆盖同名键，中文层依然
+只替换翻译范围内的显示文本。
 
 ## 1. 如何启用
 
@@ -94,6 +103,10 @@ nextflow run . -profile docker --multiqc_config assets/multiqc_config_zh_CN.yml
 
 - 不向上游 nf-core/cutandrun 发 PR。这个分支只对
   `Turing-Biotech/cutandrun`（fork）有效。
+- README 保持原样，不加指向本文档的一行链接：README 是上游跟踪文件，
+  改它会多出一个 `M`（modified）文件，破坏"diff 里只有新增文件"的零冲突
+  合并保证。入口就是本文档（`docs/multiqc_zh_CN.md`）与激活配置
+  `conf/multiqc_zh_CN.config` 文件名本身。
 - 仓库所有权不需要手动转移：fork 直接建在 Turing-Biotech 组织下。
   （如果 fork 建在个人账号 artefaritaKuniklo 名下，需要用户手动在
   Settings > General > Transfer ownership 转到组织，本仓库已经建在组织下，
@@ -119,4 +132,8 @@ patterns, sample-name trims and anchors stay English by design, because those
 headings live in upstream-tracked header files and module code. One known
 limitation: the exported General Stats PNG can show tofu for CJK labels when
 the container lacks a CJK matplotlib font; the HTML report is unaffected.
-No PR is opened against upstream nf-core/cutandrun.
+No PR is opened against upstream nf-core/cutandrun. The README is also left
+untouched on purpose: it is an upstream-tracked file, and a one-line pointer
+there would add an `M` entry to `git diff --name-status upstream/master`,
+breaking the all-`A` (added-only) merge guarantee — this document is the
+pointer instead.
