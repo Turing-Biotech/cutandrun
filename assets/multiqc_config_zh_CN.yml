@@ -1,0 +1,153 @@
+# ============================================================================
+# multiqc_config_zh_CN.yml — 简体中文 MultiQC 报告配置（additive 层）
+#
+# 本文件是 assets/multiqc_config.yml 的完整拷贝：键名、结构与顺序一一对应，
+# 只翻译覆盖范围内的显示文本（报告标题、模块名、模块描述、报告脚注、
+# 小节批注）。样本名、工具名、fn/sp 搜索模式、正则、段落锚点、绘图
+# 标识符与 run_modules/module_order/custom_content 的键名保持英文原样。
+#
+# 术语必须与 assets/zh_CN/glossary.yml（术语表）逐字一致。
+#
+# 激活方式（不改动任何上游文件）:
+#   nextflow run . -c conf/multiqc_zh_CN.config
+#
+# 说明: MultiQC 的 --config 会按加载顺序覆盖同名键，本文件在流水线默认
+# 配置（assets/multiqc_config.yml）之上生效，仅覆盖上述显示文本。
+# ============================================================================
+
+title: "CUT&RUN/CUT&TAG 质控报告（MultiQC 简体中文版）"
+
+report_comment: >
+
+  本报告由 <a href="https://github.com/nf-core/cutandrun/releases/tag/3.2.2" target="_blank">nf-core/cutandrun</a>
+  分析流水线生成。关于如何解读这些结果，请参阅
+  <a href="https://nf-co.re/cutandrun/3.2.2/docs/output" target="_blank">文档</a>。
+
+export_plots: true
+
+# Run only these modules
+run_modules:
+  - custom_content
+  - fastqc
+  - cutadapt
+  - bowtie2
+  - samtools
+  - preseq
+  - picard
+  - deeptools
+
+module_order:
+  - fastqc:
+      name: "FastQC（过滤前）"
+      info: "本节展示接头去除（adapter trimming）前的 FastQC 原始质量结果。"
+      path_filters:
+        - "./fastqc/*.zip"
+  - cutadapt
+  - fastqc:
+      name: "FastQC（过滤后）"
+      info: "本节展示接头去除（adapter trimming）后的 FastQC 质量结果。"
+      path_filters:
+        - "./trimgalore/fastqc/*.zip"
+  - bowtie2:
+      name: "Bowtie2 比对（target 目标序列）"
+      path_filters:
+        - "./bowtie2/*.bowtie2.log"
+  - bowtie2:
+      name: "Bowtie2 比对（spike-in 内参序列）"
+      path_filters:
+        - "./bowtie2_spikein/*.bowtie2.log"
+  - samtools:
+      name: "Samtools 比对得分"
+  - preseq:
+      name: "文库复杂度（Preseq）"
+  - picard:
+      name: "Picard 重复率统计"
+  - deeptools:
+      name: "片段长度质量（deeptools）"
+  - custom_content
+
+report_section_order:
+  linear_duplication_levels:
+    order: -1001
+  fragment_lengths:
+    order: -1002
+  peak_qc:
+    order: -1003
+  software_versions:
+    order: -1004
+  nf-core-cutandrun-summary:
+    order: -1005
+
+custom_content:
+  order:
+    - primary_peak_counts
+    - consensus_peak_counts
+    - primary_frip_score
+    - peak_reprod_perc
+    - software-versions-by-process
+    - software-versions-unique
+
+# Don't show % Dups in the General Stats table (we have this from Picard)
+table_columns_visible:
+  fastqc:
+    percent_duplicates: False
+
+extra_fn_clean_trim:
+  - ".spikein"
+  - ".target"
+  - ".target.filtered"
+  - "_1"
+  - "_2"
+  - "_1_val_1"
+  - "_2_val_2"
+
+section_comments:
+  fastqc_raw_fastqc_per_base_sequence_content: >
+    CUT&TAG/RUN 数据中，读段起始端的碱基组成异常是常见现象。Per-base sequence content（逐位点碱基组成）检查不合格并不意味着数据失败。
+    - 这可能是由 Tn5 转座酶偏好性造成的。
+    - 你观察到的可能是 10 bp 周期性信号，它会以锯齿状波形出现在片段长度分布中。如果是这种情况，属于正常现象，不会影响比对（alignment）或 peak calling（峰值检测）。总之我们不建议做接头去除（trimming），因为所列 bowtie2 参数在不做接头去除的情况下即可给出准确的比对信息。
+
+# Customise the module search patterns to speed up execution time
+sp:
+  cutadapt:
+    fn: "*trimming_report.txt"
+
+  samtools/stats:
+    fn: "*.stats"
+  samtools/flagstat:
+    fn: "*.flagstat"
+  samtools/idxstats:
+    fn: "*.idxstats*"
+
+  picard/markdups:
+    fn: "*.MarkDuplicates.metrics.txt"
+  picard/alignment_metrics:
+    skip: true
+  picard/basedistributionbycycle:
+    skip: true
+  picard/gcbias:
+    skip: true
+  picard/hsmetrics:
+    skip: true
+  picard/insertsize:
+    skip: true
+  picard/oxogmetrics:
+    skip: true
+  picard/pcr_metrics:
+    skip: true
+  picard/quality_by_cycle:
+    skip: true
+  picard/quality_score_distribution:
+    skip: true
+  picard/quality_yield_metrics:
+    skip: true
+  picard/rnaseqmetrics:
+    skip: true
+  picard/rrbs_metrics:
+    skip: true
+  picard/sam_file_validation:
+    skip: true
+  picard/variant_calling_metrics:
+    skip: true
+  picard/wgs_metrics:
+    skip: true

@@ -1,0 +1,235 @@
+# ============================================================================
+# glossary.yml — 简体中文报告层术语对照表（term contract）
+#
+# 适用范围: assets/multiqc_config_zh_CN.yml（MultiQC 简体中文层）。
+# 规则:
+#   1. 配置文件中所有译文必须与下表 zh 值逐字一致；
+#   2. keep_en: true 的术语在报告中必须保留英文；
+#   3. never_translate 清单中的内容永不翻译；
+#   4. 报告标题与脚注采用"中文为主、技术术语在括号内保留英文"的双语格式。
+# 风格与 Turing-Biotech/rnaseq 的 REPORT_ZH 中文层保持一致。
+#
+# 术语:
+#   en        英文原文（报告中未翻译处使用）
+#   zh        中文译文（配置文件中实际使用的字符串成分）
+#   keep_en   为 true 时该术语在报告中保持英文
+# 术语表:
+terms:
+  cutandrun:
+    en: "CUT&RUN"
+    zh: null
+    keep_en: true
+    note: "方法名，保留英文"
+  cutantag:
+    en: "CUT&TAG"
+    zh: null
+    keep_en: true
+    note: "方法名，保留英文"
+  cutantag_run:
+    en: "CUT&TAG/RUN"
+    zh: null
+    keep_en: true
+    note: "方法名组合，保留英文"
+  multiqc:
+    en: "MultiQC"
+    zh: null
+    keep_en: true
+    note: "工具名，保留英文"
+  fastqc:
+    en: "FastQC"
+    zh: null
+    keep_en: true
+    note: "工具名，保留英文"
+  bowtie2:
+    en: "Bowtie2"
+    zh: null
+    keep_en: true
+    note: "工具名，保留英文"
+  samtools:
+    en: "Samtools"
+    zh: null
+    keep_en: true
+    note: "工具名，保留英文"
+  preseq:
+    en: "Preseq"
+    zh: null
+    keep_en: true
+    note: "工具名，保留英文"
+  picard:
+    en: "Picard"
+    zh: null
+    keep_en: true
+    note: "工具名，保留英文"
+  deeptools:
+    en: "deeptools"
+    zh: null
+    keep_en: true
+    note: "工具名，保留英文"
+  tn5:
+    en: "Tn5"
+    zh: "Tn5 转座酶"
+    keep_en: true
+    note: "酶名保留英文，中文处称 Tn5 转座酶"
+  frip:
+    en: "FRiP score"
+    zh: null
+    keep_en: true
+    note: "指标名，保留英文（由上游追踪表头渲染）"
+  qc:
+    en: "quality control / QC"
+    zh: "质控"
+    keep_en: false
+  analysis_pipeline:
+    en: "analysis pipeline"
+    zh: "分析流水线"
+    keep_en: false
+  documentation:
+    en: "documentation"
+    zh: "文档"
+    keep_en: false
+  raw:
+    en: "raw"
+    zh: "过滤前"
+    keep_en: false
+    note: "指接头去除前的原始数据"
+  trimmed:
+    en: "trimmed"
+    zh: "过滤后"
+    keep_en: false
+    note: "指接头去除后的数据"
+  adapter_trimming:
+    en: "adapter trimming"
+    zh: "接头去除"
+    keep_en: false
+  trimming:
+    en: "trimming"
+    zh: "接头去除"
+    keep_en: false
+  target:
+    en: "target"
+    zh: "目标序列"
+    keep_en: false
+    note: "目标基因组/目标序列"
+  spike_in:
+    en: "spike-in"
+    zh: "内参序列"
+    keep_en: false
+    note: "spike-in 内参参考序列"
+  alignment:
+    en: "alignment"
+    zh: "比对"
+    keep_en: false
+  alignment_scores:
+    en: "alignment scores"
+    zh: "比对得分"
+    keep_en: false
+  library_complexity:
+    en: "library complexity"
+    zh: "文库复杂度"
+    keep_en: false
+  duplication_stats:
+    en: "duplication stats"
+    zh: "重复率统计"
+    keep_en: false
+  fragment_qc:
+    en: "fragment QC"
+    zh: "片段长度质量"
+    keep_en: false
+  per_base_sequence_content:
+    en: "per-base sequence content"
+    zh: "逐位点碱基组成"
+    keep_en: false
+    note: "FastQC 检查项，双语呈现：Per-base sequence content（逐位点碱基组成）"
+  tn5_preference:
+    en: "Tn5 preference"
+    zh: "Tn5 转座酶偏好性"
+    keep_en: false
+  bp_10_periodicity:
+    en: "10-bp periodicity"
+    zh: "10 bp 周期性"
+    keep_en: false
+  sawtooth_pattern:
+    en: "sawtooth pattern"
+    zh: "锯齿状波形"
+    keep_en: false
+  length_distribution:
+    en: "length distribution"
+    zh: "片段长度分布"
+    keep_en: false
+  peak_calling:
+    en: "peak calling"
+    zh: "峰值检测"
+    keep_en: false
+    note: "双语呈现：peak calling（峰值检测）"
+  mapping_information:
+    en: "mapping information"
+    zh: "比对信息"
+    keep_en: false
+  report_title:
+    en: "QC report"
+    zh: "质控报告"
+    keep_en: false
+
+# 配置文件中每个已翻译字符串的最终取值（与 assets/multiqc_config_zh_CN.yml 逐字对应）
+report_strings:
+  title: "CUT&RUN/CUT&TAG 质控报告（MultiQC 简体中文版）"
+  report_comment: >-
+    本报告由 <a href="https://github.com/nf-core/cutandrun/releases/tag/3.2.2"
+    target="_blank">nf-core/cutandrun</a> 分析流水线生成。关于如何解读这些结果，请参阅
+    <a href="https://nf-co.re/cutandrun/3.2.2/docs/output" target="_blank">文档</a>。
+  module_names_and_info:
+    - key: "module_order[fastqc raw]"
+      name: "FastQC（过滤前）"
+      info: "本节展示接头去除（adapter trimming）前的 FastQC 原始质量结果。"
+    - key: "module_order[fastqc trimmed]"
+      name: "FastQC（过滤后）"
+      info: "本节展示接头去除（adapter trimming）后的 FastQC 质量结果。"
+    - key: "module_order[bowtie2 target]"
+      name: "Bowtie2 比对（target 目标序列）"
+      info: null
+    - key: "module_order[bowtie2 spike-in]"
+      name: "Bowtie2 比对（spike-in 内参序列）"
+      info: null
+    - key: "module_order[samtools]"
+      name: "Samtools 比对得分"
+      info: null
+    - key: "module_order[preseq]"
+      name: "文库复杂度（Preseq）"
+      info: null
+    - key: "module_order[picard]"
+      name: "Picard 重复率统计"
+      info: null
+    - key: "module_order[deeptools]"
+      name: "片段长度质量（deeptools）"
+      info: null
+  section_comments:
+    fastqc_raw_fastqc_per_base_sequence_content: >-
+      CUT&TAG/RUN 数据中，读段起始端的碱基组成异常是常见现象。Per-base sequence content（逐位点碱基组成）检查不合格并不意味着数据失败。
+      - 这可能是由 Tn5 转座酶偏好性造成的。
+      - 你观察到的可能是 10 bp 周期性信号，它会以锯齿状波形出现在片段长度分布中。如果是这种情况，属于正常现象，不会影响比对（alignment）或 peak calling（峰值检测）。总之我们不建议做接头去除（trimming），因为所列 bowtie2 参数在不做接头去除的情况下即可给出准确的比对信息。
+
+# 覆盖范围（coverage）：
+#   中文（经 config 翻译）:
+#     - 报告标题（title，新增键）
+#     - 报告脚注/方法说明（report_comment）
+#     - 模块名与模块描述（module_order 各实例的 name / info）
+#     - 小节批注（section_comments 值）
+# 保持英文:
+#   - 样本名（由文件名派生，extra_fn_clean_trim 只影响清洗规则）
+#   - 工具名与软件名
+#   - 文件路径、文件名片段
+#   - MultiQC 段落锚点、绘图标识符、plot id
+#   - fn/sp 搜索模式与正则（sp.*、extra_fn_clean_trim）
+#   - run_modules / module_order / report_section_order / custom_content 的键名
+#   - 模块内部小节标题与表格列名（MultiQC 代码硬编码，config 无法覆盖）
+#   - assets/multiqc/*.txt 自定义表头（上游追踪文件，workflow 路径硬编码，
+#     含 "Peak QC"、"Sample FRiP score"、"Fragment Length Distribution" 等）
+never_translate:
+  - "sample names"
+  - "tool and software names"
+  - "file paths and file name fragments"
+  - "section anchors, plot ids, plot identifiers"
+  - "fn/sp search patterns and regular expressions"
+  - "run_modules / module_order / report_section_order / custom_content keys"
+  - "module-internal section headings and table column headers (hard-coded in MultiQC)"
+  - "assets/multiqc/*.txt custom table headers (upstream-tracked, workflow-hardcoded paths)"
