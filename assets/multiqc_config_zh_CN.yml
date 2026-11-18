@@ -17,6 +17,10 @@
 
 title: "CUT&RUN/CUT&TAG 质控报告（MultiQC 简体中文版）"
 
+# 报告副标题。英文原版由 multiqc 模板硬编码兜底
+# （"A modular tool to aggregate results ..."），intro_text 键可整体覆盖。
+intro_text: "将多个样本的生物信息分析结果汇总到单一报告中的模块化工具。"
+
 report_comment: >
 
   本报告由 <a href="https://github.com/nf-core/cutandrun/releases/tag/3.2.2" target="_blank">nf-core/cutandrun</a>
@@ -42,7 +46,8 @@ module_order:
       info: "本节展示接头去除（adapter trimming）前的 FastQC 原始质量结果。"
       path_filters:
         - "./fastqc/*.zip"
-  - cutadapt
+  - cutadapt:
+      info: "本节展示 Cutadapt 接头去除统计：去除前后读段数量与长度分布的变化。"
   - fastqc:
       name: "FastQC（过滤后）"
       info: "本节展示接头去除（adapter trimming）后的 FastQC 质量结果。"
@@ -50,20 +55,26 @@ module_order:
         - "./trimgalore/fastqc/*.zip"
   - bowtie2:
       name: "Bowtie2 比对（target 目标序列）"
+      info: "本节展示 Bowtie2 比对（alignment）结果：比对率与一致/不一致比对统计。"
       path_filters:
         - "./bowtie2/*.bowtie2.log"
   - bowtie2:
       name: "Bowtie2 比对（spike-in 内参序列）"
+      info: "本节展示 Bowtie2 比对（alignment）结果：比对率与一致/不一致比对统计。"
       path_filters:
         - "./bowtie2_spikein/*.bowtie2.log"
   - samtools:
       name: "Samtools 比对得分"
+      info: "本节展示 Samtools 比对（alignment）得分：flagstat 比对统计与逐染色体比对读段数。"
   - preseq:
       name: "文库复杂度（Preseq）"
+      info: "本节展示文库复杂度（library complexity）估计：达到给定重复率所需的读段数估算。"
   - picard:
       name: "Picard 重复率统计"
+      info: "本节展示 Picard 重复（duplicates）统计：MarkDuplicates 报告的重复读段比例。"
   - deeptools:
       name: "片段长度质量（deeptools）"
+      info: "本节展示 deeptools 计算的质量统计（含 PCA 与样本相关性）。"
   - custom_content
 
 report_section_order:
@@ -87,6 +98,36 @@ custom_content:
     - software-versions-by-process
     - software-versions-unique
 
+# 自定义内容小节的中文化。覆盖点由 MultiQC 1.19 的
+# modules/custom_content/custom_content.py 决定：
+#   - 无 parent_id 的小节：按自身 id 覆盖（解析文件时
+#     m_config.update(mod_cust_config[自身 id])）；
+#   - 带 parent_id 的小节：装配阶段只按 parent_id 取覆盖字典
+#     （mod["config"].update(mod_cust_config[mod_id])），因此
+#     只有 parent_name / parent_description 可覆盖；各子小节
+#     标题（如 Sample Peak Count）无覆盖点，保持英文。
+# 例外：id 为 software_versions 的小节组不在此覆盖。该 id 与 MultiQC
+# 内置搜索模式名（search_patterns.yaml 的 software_versions 键）重名，
+# 配置扫描阶段（custom_content.py 第 62 行 if c_id in report.files）
+# 会把该条目收进内置模式的 cust_mods 而不是 mod_cust_config，
+# 装配阶段的覆盖查找永远落空，故 "Software Versions" 组标题与描述
+# 保持英文（见 docs/multiqc_zh_CN.md 的"保持英文"清单）。
+# 数据源（assets/multiqc/*.txt 表头、custom_dumpsoftwareversions.nf、
+# WorkflowCutandrun.groovy）不改。
+custom_data:
+  linear_duplication_levels:
+    section_name: "线性重复水平（Linear Duplication Levels）"
+    description: "基于 .bam 文件中的唯一 5' 起始位点计算。"
+  fragment_lengths:
+    section_name: "片段长度分布（Fragment Length Distribution）"
+    description: "片段长度分布质控（QC）。"
+  peak_qc:
+    parent_name: "Peak 质控（Peak QC）"
+    parent_description: "本节包含基于 peak（峰值）的质控报告。"
+  nf-core-cutandrun-summary:
+    section_name: "nf-core/cutandrun 流水线运行摘要（Workflow Summary）"
+    description: "以下信息在流水线启动时收集。"
+
 # Don't show % Dups in the General Stats table (we have this from Picard)
 table_columns_visible:
   fastqc:
@@ -106,6 +147,10 @@ section_comments:
     CUT&TAG/RUN 数据中，读段起始端的碱基组成异常是常见现象。Per-base sequence content（逐位点碱基组成）检查不合格并不意味着数据失败。
     - 这可能是由 Tn5 转座酶偏好性造成的。
     - 你观察到的可能是 10 bp 周期性信号，它会以锯齿状波形出现在片段长度分布中。如果是这种情况，属于正常现象，不会影响比对（alignment）或 peak calling（峰值检测）。总之我们不建议做接头去除（trimming），因为所列 bowtie2 参数在不做接头去除的情况下即可给出准确的比对信息。
+  # 下面两条对应的英文描述由 MultiQC 模块代码硬编码（config 无法覆盖），
+  # 用批注给出同款中文说明。
+  samtools-flagstat: "本节解析 samtools flagstat 的输出。所有数值单位为百万（millions）。"
+  samtools-idxstats: "samtools idxstats 工具统计每条染色体 / contig 的比对读段数。占全部比对读段不足 0.1% 的染色体不出现在该图中。"
 
 # Customise the module search patterns to speed up execution time
 sp:

@@ -173,6 +173,7 @@ terms:
 # 配置文件中每个已翻译字符串的最终取值（与 assets/multiqc_config_zh_CN.yml 逐字对应）
 report_strings:
   title: "CUT&RUN/CUT&TAG 质控报告（MultiQC 简体中文版）"
+  intro_text: "将多个样本的生物信息分析结果汇总到单一报告中的模块化工具。"
   report_comment: >-
     本报告由 <a href="https://github.com/nf-core/cutandrun/releases/tag/3.2.2"
     target="_blank">nf-core/cutandrun</a> 分析流水线生成。关于如何解读这些结果，请参阅
@@ -181,38 +182,71 @@ report_strings:
     - key: "module_order[fastqc raw]"
       name: "FastQC（过滤前）"
       info: "本节展示接头去除（adapter trimming）前的 FastQC 原始质量结果。"
+    - key: "module_order[cutadapt]"
+      name: null
+      info: "本节展示 Cutadapt 接头去除统计：去除前后读段数量与长度分布的变化。"
     - key: "module_order[fastqc trimmed]"
       name: "FastQC（过滤后）"
       info: "本节展示接头去除（adapter trimming）后的 FastQC 质量结果。"
     - key: "module_order[bowtie2 target]"
       name: "Bowtie2 比对（target 目标序列）"
-      info: null
+      info: "本节展示 Bowtie2 比对（alignment）结果：比对率与一致/不一致比对统计。"
     - key: "module_order[bowtie2 spike-in]"
       name: "Bowtie2 比对（spike-in 内参序列）"
-      info: null
+      info: "本节展示 Bowtie2 比对（alignment）结果：比对率与一致/不一致比对统计。"
     - key: "module_order[samtools]"
       name: "Samtools 比对得分"
-      info: null
+      info: "本节展示 Samtools 比对（alignment）得分：flagstat 比对统计与逐染色体比对读段数。"
     - key: "module_order[preseq]"
       name: "文库复杂度（Preseq）"
-      info: null
+      info: "本节展示文库复杂度（library complexity）估计：达到给定重复率所需的读段数估算。"
     - key: "module_order[picard]"
       name: "Picard 重复率统计"
-      info: null
+      info: "本节展示 Picard 重复（duplicates）统计：MarkDuplicates 报告的重复读段比例。"
     - key: "module_order[deeptools]"
       name: "片段长度质量（deeptools）"
-      info: null
+      info: "本节展示 deeptools 计算的质量统计（含 PCA 与样本相关性）。"
+  # custom_data 小节（section_name/description/parent_name/parent_description
+  # 的用户侧覆盖值，逐字对应 assets/multiqc_config_zh_CN.yml 的 custom_data 段）。
+  # 覆盖点：无 parent_id 的小节按自身 id；带 parent_id 的小节组只覆盖
+  # parent_name/parent_description（按 parent_id），子小节标题无覆盖点。
+  # 例外：software_versions 小节组 id 与 MultiQC 内置搜索模式重名，
+  # 覆盖在 1.19 不生效（config 条目被收进内置模式的 cust_mods），保持英文。
+  custom_data:
+    linear_duplication_levels:
+      section_name: "线性重复水平（Linear Duplication Levels）"
+      description: "基于 .bam 文件中的唯一 5' 起始位点计算。"
+    fragment_lengths:
+      section_name: "片段长度分布（Fragment Length Distribution）"
+      description: "片段长度分布质控（QC）。"
+    peak_qc:
+      parent_name: "Peak 质控（Peak QC）"
+      parent_description: "本节包含基于 peak（峰值）的质控报告。"
+    nf-core-cutandrun-summary:
+      section_name: "nf-core/cutandrun 流水线运行摘要（Workflow Summary）"
+      description: "以下信息在流水线启动时收集。"
   section_comments:
     fastqc_raw_fastqc_per_base_sequence_content: >-
       CUT&TAG/RUN 数据中，读段起始端的碱基组成异常是常见现象。Per-base sequence content（逐位点碱基组成）检查不合格并不意味着数据失败。
       - 这可能是由 Tn5 转座酶偏好性造成的。
       - 你观察到的可能是 10 bp 周期性信号，它会以锯齿状波形出现在片段长度分布中。如果是这种情况，属于正常现象，不会影响比对（alignment）或 peak calling（峰值检测）。总之我们不建议做接头去除（trimming），因为所列 bowtie2 参数在不做接头去除的情况下即可给出准确的比对信息。
+    samtools-flagstat: "本节解析 samtools flagstat 的输出。所有数值单位为百万（millions）。"
+    samtools-idxstats: "samtools idxstats 工具统计每条染色体 / contig 的比对读段数。占全部比对读段不足 0.1% 的染色体不出现在该图中。"
 
 # 覆盖范围（coverage）：
 #   中文（经 config 翻译）:
 #     - 报告标题（title，新增键）
+#     - 报告副标题（intro_text，新增键）
 #     - 报告脚注/方法说明（report_comment）
-#     - 模块名与模块描述（module_order 各实例的 name / info）
+#     - 模块名与模块描述（module_order 各实例的 name / info，共 9 个实例）
+#     - 自定义内容小节（custom_data 用户侧覆盖，数据源文件不改）：
+#       无 parent_id 的小节按自身 id 覆盖 section_name / description
+#       （linear_duplication_levels、fragment_lengths、nf-core-cutandrun-summary）；
+#       带 parent_id 的小节组按 parent_id 只覆盖 parent_name / parent_description
+#       （peak_qc）；
+#       子小节标题（Sample Peak Count、Sample FRiP score 等）与
+#       software_versions 小节组（id 与 MultiQC 内置搜索模式重名，
+#       覆盖不生效）在 1.19 无可用覆盖点，保持英文
 #     - 小节批注（section_comments 值）
 # 保持英文:
 #   - 样本名（由文件名派生，extra_fn_clean_trim 只影响清洗规则）
@@ -221,10 +255,10 @@ report_strings:
 #   - MultiQC 段落锚点、绘图标识符、plot id
 #   - fn/sp 搜索模式与正则（sp.*、extra_fn_clean_trim）
 #   - run_modules / module_order / report_section_order / custom_content 的键名
-#   - 模块内部 h3 小节标题（MultiQC 代码硬编码，config 无法覆盖）；
-#     General Stats 列名技术上可用 table_columns_name 覆写（设计稿 §6.1 实测），v1 不启用
-#   - assets/multiqc/*.txt 自定义表头（上游追踪文件，workflow 路径硬编码，
-#     含 "Peak QC"、"Sample FRiP score"、"Fragment Length Distribution" 等）
+#   - 标准工具模块（fastqc/cutadapt/bowtie2/samtools/preseq/picard/deeptools）
+#     内部的 h3 小节标题及其下方描述（MultiQC 模块代码硬编码，
+#     1.19 无 config 覆盖机制；samtools 两处已用中文批注补充说明）；
+#     General Stats 列名技术上可用 table_columns_name 覆写（设计稿 §6.1 实测），不启用
 never_translate:
   - "sample names"
   - "tool and software names"
@@ -232,5 +266,4 @@ never_translate:
   - "section anchors, plot ids, plot identifiers"
   - "fn/sp search patterns and regular expressions"
   - "run_modules / module_order / report_section_order / custom_content keys"
-  - "module-internal h3 section headings (hard-coded in MultiQC; General Stats column names are overridable via table_columns_name, v2 path, not enabled in v1)"
-  - "assets/multiqc/*.txt custom table headers (upstream-tracked, workflow-hardcoded paths)"
+  - "standard-tool module-internal h3 subsection headings and their descriptions (hard-coded in MultiQC, no config override in 1.19; the two samtools cases carry a Chinese section_comment instead; General Stats column names are overridable via table_columns_name, not enabled)"
