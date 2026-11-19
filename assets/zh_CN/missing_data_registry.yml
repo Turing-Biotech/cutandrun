@@ -1,0 +1,71 @@
+# ============================================================================
+# assets/zh_CN/missing_data_registry.yml — 交付报告缺失数据登记
+# Phase 1 = 本管线 8 模块能给出的全部给出 + 本文件记录缺口；
+# Phase 2 = 在 pipeline 后补模块，真实数据替换占位并销账（status: open → done）。
+# 每条 = 小节 id + 缺什么 + vendor 侧证据 + 期望数据契约 + Phase 2 补法。
+# ============================================================================
+version: 1
+run: "02:/mnt/data/TL004/15.CUTTAG_Pipeline (8-19 终跑, samplesheet C/E 各 3 重复)"
+
+# --- work-only 输入面（8-19 multiqc task 的 work/ 目录已被清理）-----------
+multiqc_work_only:
+  status: open
+  affected: [FRiP 得分, sample peak 可重复性 %, 片段长度分布, 线性重复水平,
+             Picard 重复率(6样本面), 软件版本(6样本), workflow summary]
+  vendor_evidence: 参考报告无对应小节（vendor 用自己的 21 阶段内部 QC）
+  why_missing: >-
+    6 样本生产面从发布 output/ 重建（scripts/build_multiqc_input_face.py），
+    但上述小节的数据面只存在于被清理的 8-19 multiqc task work/ 目录
+    （peak_metrics/peak_frip、peak_reprod_perc、frag_len、linear_duplicates、
+    picard/markduplicates、software_versions 均为 work/ 产物，未发布）。
+  data_contract:
+    - "peak_frip: 每样本 1 行 _mqc.tsv（header 见 assets/multiqc/frip_score_header.txt）"
+    - "peak_reprod_perc: 每 repeat-set 1 行 _mqc.tsv（header 见 peak_reprod_header.txt）"
+    - "frag_len: frag_len_mqc.yml（custom linegraph，header 见 frag_len_header.txt）"
+    - "linear_duplicates: custom_content tsv（header 见 linear_duplication_header.txt）"
+    - "picard: *.MarkDuplicates.metrics.txt 每样本 1 份"
+    - "software_versions: software_versions_{unique_,}mqc.yml + workflow_summary_mqc.yml"
+  remedi: >-
+    Phase 2a: 在 fork 的 MULTIQC 发布步骤中把上述 work/ 产物一并
+    publishDir 到 04_reporting/multiqc_inputs/（一次管线参数变更，可随下次运行落地），
+    或从 bam 重算（frip/reprod 需要 bam；frag_len 需要 bam 的 pair 距离）。
+  crosscheck_2sample: >-
+    10-14 的 2 样本（C_R1/E_R1）完整 work 面用于交叉核对数字一致性；
+    该面本身无 peak_frip/peak_reprod 数据（其 multiqc 输入面也不完整），
+    故此两处即使在 2 样本面也缺席——属运行参数/流程选择，非数据损坏。
+
+# --- vendor 侧占位图（Q4）----------------------------------------------------
+de_novo_motif_figures:
+  id: M1
+  status: open
+  vendor_section: 11.findMotifs_v3 / 17.DiffFindMotifs_v3
+  placeholder_figures:
+    - ./11.findMotifs_v3/peakAnno_homerResults_FakeExample.png
+    - ./11.findMotifs_v3/peakAnno_knownResults_FakeExample.png
+    - ./17.DiffFindMotifs_v3/ChIPSeeker_knownResults_FakeExample.png
+    - ./17.DiffFindMotifs_v3/homer_homerResults_FakeExample.png
+  what_is_missing: de novo/known motif 成图（HOMER/ChIPSeeker 输出）
+  data_contract: "HOMER findMotifsGenomeIn 结果目录 + makeLogo/heatmap PNG（宽>800px）"
+  phase2_remedy: 补 HOMER 模块（pipeline 或 R 后处理），对 consensus peak 序列跑 de novo + TOMMotifs known，成图替换并销账
+
+go_kegg_network_figures:
+  id: M2
+  status: open
+  vendor_section: 15.Network_v3 / 21.DiffNetwork_v3
+  placeholder_figures:
+    - ./15.Network_v3/example_GO_BP.png
+    - ./15.Network_v3/example_Pathway.png
+    - ./21.DiffNetwork_v3/example_GO_BP.png
+    - ./21.DiffNetwork_v3/example_Pathway.png
+  what_is_missing: GO/KEGG 条目网络图（igraph）
+  data_contract: "clusterProfiler enrich 结果 + igraph network PNG（顶点=条目，边=关系）"
+  phase2_remedy: 补 clusterProfiler + igraph 模块，从 T13/T14/T26/T28 关系表建图，成图替换并销账
+
+diff_peak_chain:
+  id: M3
+  status: open
+  vendor_section: S3 全部（16-21.* 目录，T16-T28）
+  what_is_missing: 差异 Peak 全链（diff peaks / diff motif / diff anno / diff GO/KEGG / diff 网络）
+  why: 本管线（nf-core/cutandrun）无差异 Peak 流程；由 vendor 交付后处理流程完成
+  data_contract: 与 vendor 16-21.* 目录同构（T16-T28 各表 + 图）
+  phase2_remedy: 补 R 后处理模块（DESeq2 peak-count + clusterProfiler），或维持 vendor 产出口径并显式标注「交付后处理流程完成」

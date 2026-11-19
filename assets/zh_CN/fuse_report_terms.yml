@@ -1,0 +1,90 @@
+# ============================================================================
+# assets/zh_CN/fuse_report_terms.yml — 交付报告融合（图凌生物口径）定点替换表
+# 单一来源纪律：scripts/fuse_report_zh.py 使用的固定串以本文件为准，
+# 每条记录替换前原文（before）与替换后文本（after）逐字固定，可审计。
+# ============================================================================
+version: 1
+generated_for: "JYKF2026070011 (小鼠 GRCm39, C1-3/E1-3)"
+
+# --- Q1 品牌 -------------------------------------------------------------
+brand_text:
+  before: "嘉因生物"
+  after: "图凌生物"
+  occurrences_vendor: 5
+  locations:
+    - "实验流程段（背景介绍内：嘉因生物对样品检测、建库、测序…）"
+    - "附录 h3：图凌生物公众号"
+    - "附录 h3：图凌生物微信公众号-客户文章链接（×2 处文本）"
+
+rainbow_sidebar_link:
+  before: '<a href="http://www.rainbow-genome.com" style="display:block;width:50%;margin-left:25%;"><img src="./imgHeader/logo.jpg" alt="logo.jpg"></a>'
+  after: '<div style="display:block;width:50%;margin:0 auto;text-align:center;padding:18px 0;border:2px solid #c9d4e8;border-radius:8px;color:#1f4ea0;font-size:20px;font-weight:600;letter-spacing:2px;">图凌生物</div>'
+  note: "素材到位后（B1）把占位块换成 <img src='./imgExtra/logo_tuling.png'>"
+
+cover_image:
+  before: '<img src="./imgHeader/cover_jiayin.png" alt="cover_jiayin.png">'
+  after: '<div style="margin:0 auto;padding:26px 40px;border:2px dashed #c9d4e8;border-radius:10px;color:#5c6b84;font-size:15px;text-align:center;max-width:520px;">图凌生物（封面/品牌图位：素材到位后替换此占位块）</div>'
+
+tail_qr_image:
+  before: '<img src="./imgTail/jiayin.jpg" alt="jiayin.jpg">'
+  after: "同 cover_image 的占位块"
+  note: "附录公众号小节保留图凌公众号标题，二维码素材位留占位"
+
+vendor_weixin_album_links:
+  before: '<a href="https://mp.weixin.qq.com/mp/appmsgalbum?…">…</a>'
+  match: "按前缀 https://mp.weixin.qq.com/mp/appmsgalbum 正则整条匹配（×2）"
+  after: '<span style="color:#8a94a6;">（图凌公众号文章链接：待定）</span>'
+
+# --- Q2 流程图 --------------------------------------------------------------
+flow_diagram:
+  vendor_figure: "./imgHeader/CUT_Tag3.png"
+  vendor_figure_label_after: "交付全流程（含扩展分析，参考原报告）"
+  new_main_figure: "./imgExtra/pipeline_8modules.png"
+  new_main_figure_label: "本管线实际分析流程（nf-core/cutandrun，步骤与发布目录一一对应）"
+  note: >-
+    主图按用户口径画本管线实际流程（忠实仓库 README 的 17 步 Pipeline summary，
+    按 01-04 发布目录分 5 组）；vendor 21 阶段商业图降级为附图并加注。
+    两阶段路线：Phase 1 只给本管线能给出的信息，Phase 2 补模块后完善。
+
+# --- Q3 比对口径 -------------------------------------------------------------
+alignment_method:
+  before_zh_anchor: "本次分析采用 BWA 比对软件 … 本项目分析采用的是 BWA-MEM。</p>"
+  after_zh: >-
+    本次分析采用 Bowtie2 比对软件。 在比对之前，将下机的 raw data 进行去接头处理，
+    得到的 clean data 使用 Bowtie2 分别比对到参考基因组
+    ncbi_Mus_musculus_mm39_GCF_000001635.27 与 spike-in 基因组上。
+    Bowtie2（Burrows-Wheeler aligner 2）是一种基于 FM-index 的短序列高速比对软件，
+    特点是快速、准确、内存占用低，支持局部（gapped）比对模式，是 RNA-seq、ChIP-seq
+    及 CUT&Tag 等二代测序数据分析中最常用的比对工具之一。
+    本项目分析采用的是 Bowtie2 的局部比对模式（-D 20 -R 3 -N 0 -L 20 -E 2 -u 4）。
+  before_en: >-
+    Before read mapping, clean reads were obtained from the raw reads by removing
+    the adaptor sequences. The clean reads were then aligned to reference genome
+    sequences using the bwa program.
+  after_en: >-
+    Before read mapping, clean reads were obtained from the raw reads by removing
+    the adaptor sequences. The clean reads were then aligned to reference genome
+    sequences using the bowtie2 program (alignment to both the target genome and
+    the spike-in genome).
+
+# --- Q4 占位图 ----------------------------------------------------------------
+placeholder_figures:
+  rule: "文件名含 Fake/example_ 的图 = 示例占位图 → 加红底白字「示例图」角标，保留至真实数据替换"
+  badge_html: '<span class="fig-badge">示例图</span>'
+  expected_count: 8
+  lists:
+    - "./11.findMotifs_v3/peakAnno_homerResults_FakeExample.png"
+    - "./11.findMotifs_v3/peakAnno_knownResults_FakeExample.png"
+    - "./15.Network_v3/example_GO_BP.png"
+    - "./15.Network_v3/example_Pathway.png"
+    - "./17.DiffFindMotifs_v3/ChIPSeeker_knownResults_FakeExample.png"
+    - "./17.DiffFindMotifs_v3/homer_homerResults_FakeExample.png"
+    - "./21.DiffNetwork_v3/example_GO_BP.png"
+    - "./21.DiffNetwork_v3/example_Pathway.png"
+
+# --- 新增 Section -------------------------------------------------------------
+multiqc_section:
+  heading: "标准分析 Section 1.5-质控交互报告（MultiQC 中文版）"
+  insert_before: '<h1 class="chapterTitle mar-top-80">标准分析 Section 2-peak分析</h1>'
+  iframe_src: "multiqc/multiqc_report.html"
+  note: "vendor 的 ztree_toc.js 从 :header 自动生成目录并自动编号，插入后无需维护目录。"
