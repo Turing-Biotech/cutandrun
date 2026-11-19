@@ -225,6 +225,22 @@ report_strings:
     nf-core-cutandrun-summary:
       section_name: "nf-core/cutandrun 流水线运行摘要（Workflow Summary）"
       description: "以下信息在流水线启动时收集。"
+  # Peak QC 组下 4 个子小节：MultiQC 1.19 无 config 覆盖点（装配阶段只按
+  # parent_id 合并），中文由后置脚本 scripts/multiqc_zh_titles.py 对渲染后
+  # 的 HTML 做固定替换。逐字值在此固定；脚本替换表必须与本节一致。
+  peak_qc_children:
+    primary_peak_counts:
+      section_name: "样本 Peak 数量（Sample Peak Count）"
+      description: "由 MACS2 或 SEACR 所调用的 peak 总数计算得到。"
+    consensus_peak_counts:
+      section_name: "共识 Peak 数量（Consensus Peak Count）"
+      description: "由 MACS2 或 SEACR 所调用的 peak 总数计算得到。"
+    primary_frip_score:
+      section_name: "样本 FRiP 得分（FRiP score）"
+      description: "由落在 MACS2 或 SEACR 所调用 peak 区域内的比对片段占全部比对片段的比例计算得到。详见 <a href='https://www.encodeproject.org/data-standards/terms/' target='_blank'>FRiP 得分</a>。"
+    peak_reprod_perc:
+      section_name: "样本 Peak 可重复性（reproducibility）%"
+      description: "由组内重复样本之间重叠 peak 的总数计算得到。"
   section_comments:
     fastqc_raw_fastqc_per_base_sequence_content: >-
       CUT&TAG/RUN 数据中，读段起始端的碱基组成异常是常见现象。Per-base sequence content（逐位点碱基组成）检查不合格并不意味着数据失败。
@@ -244,9 +260,10 @@ report_strings:
 #       （linear_duplication_levels、fragment_lengths、nf-core-cutandrun-summary）；
 #       带 parent_id 的小节组按 parent_id 只覆盖 parent_name / parent_description
 #       （peak_qc）；
-#       子小节标题（Sample Peak Count、Sample FRiP score 等）与
-#       software_versions 小节组（id 与 MultiQC 内置搜索模式重名，
-#       覆盖不生效）在 1.19 无可用覆盖点，保持英文
+#       peak_qc 组下 4 个子小节标题/描述由后置脚本 scripts/multiqc_zh_titles.py
+#       完成（见 report_strings.peak_qc_children）；
+#       software_versions 小节组（id 与内置搜索模式重名）及其子小节
+#       （标题为含运行期目录名的 GString）在 1.19 无可用覆盖点，保持英文
 #     - 小节批注（section_comments 值）
 # 保持英文:
 #   - 样本名（由文件名派生，extra_fn_clean_trim 只影响清洗规则）

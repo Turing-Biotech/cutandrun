@@ -1,7 +1,7 @@
 # MultiQC 简体中文报告（zh_CN）
 
-这个分支在英文流水线之上加了一层简体中文 MultiQC 报告。整层只由三个新文件组成
-（本文档是分支上的第四个新增文件，仅作使用说明，不参与报告生成），
+这个分支在英文流水线之上加了一层简体中文 MultiQC 报告。整层只由四个新文件组成
+（本文档是第五个新增文件，仅作使用说明，不参与报告生成），
 没有改动任何上游（nf-core/cutandrun）文件，也没有改 `nextflow.config`、工作流或
 模块。不传激活配置时，报告与原版完全一致。
 
@@ -10,6 +10,7 @@
 | `assets/multiqc_config_zh_CN.yml` | 中文 MultiQC 配置。结构与 `assets/multiqc_config.yml` 一一对应，只翻译显示文本 |
 | `conf/multiqc_zh_CN.config` | 激活配置。把 `params.multiqc_config` 指向上面的 zh 配置 |
 | `assets/zh_CN/glossary.yml` | 术语表。每条被翻译的字符串逐字固定，并列出永不翻译的词 |
+| `scripts/multiqc_zh_titles.py` | 后置改写脚本。把 Peak QC 组内 4 个子小节的标题与描述改成中文（MultiQC 1.19 对这类子小节无 config 覆盖点，只能对渲染后的 HTML 做固定替换） |
 
 原理：MULTIQC 进程的命令行为 `multiqc -f [--config <params.multiqc_config>] .`
 （`modules/local/multiqc.nf` L46-48：只有 `params.multiqc_config` 非空时才追加
@@ -56,7 +57,18 @@ nextflow run . -profile docker --multiqc_config assets/multiqc_config_zh_CN.yml
 两种写法都只设置同一个 `params.multiqc_config`。同时传 `-c` 和
 `--multiqc_config` 不冲突，值是同一个文件。
 
-启用后在报告里确认四处：
+运行结束后，对**中文报告**应用 Peak QC 子小节标题改写（1.19 对带
+parent_id 的子小节没有 config 覆盖点，见 §2"保持英文"）：
+
+```bash
+python3 scripts/multiqc_zh_titles.py <outdir>/04_reporting/multiqc/multiqc_report.html
+```
+
+脚本只作用于中文版报告（检测到中文大标题才动手，对英文报告直接拒绝，exit 2），
+重复运行幂等，有任何预期的英文串缺失就 exit 1 且不落盘。这一步不做的话，
+Peak QC 组内 4 个子小节标题保持英文，其余部分不受影响。
+
+启用后在报告里确认五处：
 
 1. 报告大标题（h1）为「CUT&RUN/CUT&TAG 质控报告（MultiQC 简体中文版）」，
    其下副标题为「将多个样本的生物信息分析结果汇总到单一报告中的模块化工具。」。
@@ -64,14 +76,15 @@ nextflow run . -profile docker --multiqc_config assets/multiqc_config_zh_CN.yml
    标题下的模块描述（如「本节展示 Samtools 比对（alignment）得分：…」）也是中文。
 3. 自定义内容小节：无 parent_id 的小节（线性重复水平、片段长度分布、
    流水线运行摘要）标题与描述为中文；带 parent_id 的小节组标题为中文
-   （「Peak 质控（Peak QC）」），组内子小节标题（如 Sample Peak Count）
-   在 MultiQC 1.19 无覆盖点，保持英文。"Software Versions" 组因 id 与
-   MultiQC 内置搜索模式重名，覆盖不生效，保持英文。
-4. 报告末尾脚注为中文。
+   （「Peak 质控（Peak QC）」）；组内子小节标题（「样本 Peak 数量（Sample Peak Count）」
+   等 4 个）在跑过后置脚本后也是中文。
+4. "Software Versions" 组标题因 id 与 MultiQC 内置搜索模式重名，覆盖不生效，
+   保持英文（其子小节标题含运行期目录名，无法稳定匹配，同样保持英文）。
+5. 报告末尾脚注为中文。
 
 ## 2. 什么被翻译，什么保持英文
 
-### 翻译的（config 层显示字符串，共 31 处显示值）
+### 翻译的（共 39 处显示值：config 层 31 处 + 后置脚本 8 处）
 
 | 位置 | 英文原版 | 中文现值 |
 |---|---|---|
@@ -82,6 +95,7 @@ nextflow run . -profile docker --multiqc_config assets/multiqc_config_zh_CN.yml
 | `module_order` 模块描述 `info` ×9 | 各模块硬编码句（如 "Samtools is a suite of programs for interacting with high-throughput sequencing data."） | 「本节展示…」9 句，逐字见 `glossary.yml` 的 `report_strings.module_names_and_info` |
 | `custom_data` 小节标题/描述 | 无 parent_id 小节按自身 id：Linear Duplication Levels、Fragment Length Distribution、Workflow Summary（原在 `assets/multiqc/*.txt` 表头与 groovy 代码中） | 逐字见 `glossary.yml` 的 `report_strings.custom_data` |
 | `custom_data` 小节组标题/描述 | 带 parent_id 小节组仅 parent_name/parent_description 可覆盖（按 parent_id）：Peak QC | Peak 质控（Peak QC）+ 中文描述，逐字见 `glossary.yml` |
+| `peak_qc_children` 4 个子小节标题/描述 | Sample Peak Count、Consensus Peak Count、Sample FRiP score、Sample Peak reproducibility % 及各自描述（来自 `assets/multiqc/*_header.txt`）。config 层无覆盖点 | 由 `scripts/multiqc_zh_titles.py` 对渲染后的 HTML 固定替换，逐字见 `glossary.yml` 的 `report_strings.peak_qc_children` |
 | `section_comments` ×3 | Per-base sequence content 批注 + samtools flagstat/idxstats 两条 | 见 `assets/multiqc_config_zh_CN.yml` 的 `section_comments` 段 |
 
 所有被翻译字符串的逐字值固定在 `assets/zh_CN/glossary.yml`，改词必须走术语表。
@@ -95,9 +109,10 @@ nextflow run . -profile docker --multiqc_config assets/multiqc_config_zh_CN.yml
   内部的 h3 小节标题及其描述：这些由 MultiQC 模块代码硬编码，1.19 没有
   config 覆盖机制。samtools 的 flagstat/idxstats 两处已用 `section_comments`
   中文批注补充等效说明（见 `section_comments` 段）。
-- 自定义内容中带 parent_id 小节的子小节标题（Sample Peak Count、Sample
-  FRiP 等）：1.19 装配阶段只按 parent_id 合并覆盖字典，子 id 没有覆盖点，
-  留英文；组级标题/描述已中文化。
+- 自定义内容中带 parent_id 小节的子小节：MultiQC 1.19 装配阶段只按
+  parent_id 合并覆盖字典，子 id 没有覆盖点，config 层无解。其中
+  **peak_qc 组下 4 个**已由后置脚本 `scripts/multiqc_zh_titles.py`
+  中文化；组级标题/描述由 config 中文化。
 - "Software Versions" 小节组的标题与描述：该 id 与 MultiQC 内置搜索模式名
   （search_patterns.yaml 的 `software_versions` 键）重名，配置扫描阶段
   （custom_content.py 的 `if c_id in report.files`）会把自定义条目收进内置
@@ -124,19 +139,27 @@ nextflow run . -profile docker --multiqc_config assets/multiqc_config_zh_CN.yml
   （如果 fork 建在个人账号 artefaritaKuniklo 名下，需要用户手动在
   Settings > General > Transfer ownership 转到组织，本仓库已经建在组织下，
   没有这一步。）
-- 不改容器镜像、字体、`nextflow.config` 或任何上游文件。
+- 不改容器镜像、字体、`nextflow.config` 或任何上游文件。特别说明：
+  **不改 `assets/multiqc/*.txt` 表头文件**——它们由 `workflows/cutandrun.nf`
+  硬编码引用并 cat 进每个指标 TSV，是英文报告与中文报告共用的数据源；
+  若直接改成中文，英文报告的同 4 个小节会跟着变中文，还多出 4 个 `M`
+  文件破坏全 `A` 合并保证。改道方案就是后置脚本
+  `scripts/multiqc_zh_titles.py`（只改中文报告的 HTML）。
 
 ## English summary (for maintainers)
 
 This branch adds a Simplified-Chinese MultiQC report as a purely additive
-layer on this fork of nf-core/cutandrun. The report layer is three new files
-(this document is a fourth, doc-only file), zero changes to upstream-tracked
+layer on this fork of nf-core/cutandrun. The report layer is four new files
+(this document is a fifth, doc-only file), zero changes to upstream-tracked
 files, so rebasing or merging upstream `master` later stays conflict-free:
 `assets/multiqc_config_zh_CN.yml` is a full copy of
 `assets/multiqc_config.yml` with the in-scope display strings translated
 (report title, subtitle via the `intro_text` key, footer, module names and
 descriptions via `module_order` `info`, custom-content sections via
 `custom_data` overrides, and section comments);
+`scripts/multiqc_zh_titles.py` post-writes the four Peak QC child section
+titles and descriptions into the rendered zh HTML (applied after the run,
+refuses non-zh reports, idempotent);
 `conf/multiqc_zh_CN.config` points `params.multiqc_config` at it, which the
 pipeline already forwards to MultiQC as `--config`; `assets/zh_CN/glossary.yml`
 pins every translated string and lists the never-translate terms. Run
@@ -145,15 +168,19 @@ Chinese report; without the flag the report is byte-for-byte the English
 original. Standard-tool module-internal h3 subsection titles and descriptions
 (e.g. samtools flagstat/idxstats) stay English: MultiQC 1.19 hard-codes them
 with no config override, so the two samtools cases carry a Chinese
-`section_comment` instead. Likewise, child subsection titles under a
-`parent_id` group (Sample Peak Count, Sample FRiP score) have no override
-point in 1.19 — only the group-level `parent_name`/`parent_description` can
-be overridden — so they stay English. The "Software Versions" group cannot
-be overridden either: its section id collides with MultiQC's built-in
-`software_versions` search-pattern name, so the config entry is claimed by
-the built-in pattern's cust_mods during the config scan and the assembly
-lookup never sees it. All config keys, search patterns, sample-name
-trims and anchors stay English by design. One known
+`section_comment` instead. Child subsections under a `parent_id` group have
+no per-child override point in 1.19 (assembly merges only by parent_id), so
+the four Peak QC children are Chinese-ified by the post script
+`scripts/multiqc_zh_titles.py` instead of the config — the upstream
+`assets/multiqc/*_header.txt` templates stay untouched because they feed the
+English report too. The "Software Versions" group cannot be overridden
+either: its section id collides with MultiQC's built-in `software_versions`
+search-pattern name, so the config entry is claimed by the built-in
+pattern's cust_mods during the config scan and the assembly lookup never
+sees it; its child titles additionally embed the run-time pipeline dir name
+and cannot be matched reliably, so the whole group stays English. All config
+keys, search patterns, sample-name trims and anchors stay English by design.
+One known
 limitation: the exported General Stats PNG can show tofu for CJK labels when
 the container lacks a CJK matplotlib font; the HTML report is unaffected.
 No PR is opened against upstream nf-core/cutandrun. The README is also left
