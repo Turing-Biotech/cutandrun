@@ -22,10 +22,13 @@ vendor 原目录只读；所有改动只发生在 `--outdir` 生成树上，重�
 1. **外壳搬移** — vendor `report.html` + 全部 21 阶段资产目录原样进 outdir。
    左侧 ztree 目录由 vendor 自带 `js/ztree_toc.js` 在渲染时从 `:header`
    动态生成并自动编号，**插入新 Section 后目录自动更新，无需维护**。
-2. **品牌（Q1）** — 「嘉因生物」×5 → 「图凌生物」；侧栏 rainbow-genome
-   logo 链接、封面 `cover_jiayin.png`、附录 `jiayin.jpg` 二维码各换为
-   图凌文字占位块；vendor 公众号微信链接 ×2（S1 可视化引用 + 附录相册）
-   移除为待定标注。素材到位后只需替换占位块内的 `img`。
+2. **品牌（Q1）** — 「嘉因生物」×5 → 「图凌生物」（附录删除后正文剩余 1 处）；
+   侧栏 rainbow-genome logo 链接、封面 `cover_jiayin.png` 各换为
+   图凌文字占位块；vendor 公众号微信链接（S1 可视化引用 + 附录相册）移除
+   为待定标注。素材到位后只需替换占位块内的 `img`。
+2b. **附录删除（2026-11-19 裁决）** — 「附录」h1 整节移除（公众号 h3×2 +
+   二维码 + 客户文章链接），文档以 vendor post-content script 块收尾；
+   生成器内 MultiQC Section 的自引用改为指向文内「数据口径与缺失登记」小节。
 3. **流程图（Q2）** — S1 前「生物信息分析流程」改为双轨：主图为 8 模块
    流程图（`imgExtra/pipeline_8modules.png`，本管线实际流程，与 01-04
    发布目录一一对应），vendor 21 阶段图降级为附图并加「交付全流程」角标。
@@ -75,13 +78,13 @@ python3 scripts/fuse_report_zh.py \
 python3 scripts/fuse_report_zh.py --verify-only --outdir …/data/report
 ```
 
-## 验收（22 项内嵌于 `--verify`，当前 ALL PASS）
+## 验收（24 项内嵌于 `--verify`，当前 ALL PASS）
 
-标题 ≥40（vendor 39 + MultiQC 1）；MultiQC Section/iframe 在位；
-嘉因/jiayin/rainbow/vendor 微信链接/BWA 旧表述全部 0 残留；图凌在位；
-Bowtie2 中英文段在位；表 ≥28（vendor 28 + 口径 2）；全部 img 引用可解析；
-「示例图」角标 ==8；8 模块主图 + 21 阶段附图均在；multiqc zh 报告标题/
-Peak QC 中文化/无 tofu；css/js/imgHeader/imgTail 资产目录在位。
+标题 ≥38（vendor 39 − 附录 3 + MultiQC 1）；附录 h1/公众号残留 0；MultiQC
+Section/iframe 在位；嘉因/jiayin/rainbow/vendor 微信链接/BWA 旧表述全部 0
+残留；图凌在位；Bowtie2 中英文段在位；表 ≥28（vendor 28 + 口径 2）；全部
+img 引用可解析；「示例图」角标 ==8；8 模块主图 + 21 阶段附图均在；
+multiqc zh 报告标题/Peak QC 中文化/无 tofu；css/js/imgHeader/imgTail 资产目录在位。
 
 ## 数字口径（2026-11-19 渲染实例）
 

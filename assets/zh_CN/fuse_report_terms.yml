@@ -27,8 +27,14 @@ cover_image:
 
 tail_qr_image:
   before: '<img src="./imgTail/jiayin.jpg" alt="jiayin.jpg">'
-  after: "同 cover_image 的占位块"
-  note: "附录公众号小节保留图凌公众号标题，二维码素材位留占位"
+  after: "已随附录整节移除（2026-11-19 裁决：删除附录一节）"
+  note: "附录（附录 h1 + 公众号 h3×2）整体删除，不再做二维码占位"
+
+appendix_removal:
+  ruling: "2026-11-19 用户裁决：交付报告删除附录一节"
+  cut_range: "<h1 class=\"chapterTitle mar-top-80\">附录</h1> 起，至 <script src=\"js/myJs/vue.min.js\"> 前止"
+  removed_content: "嘉因公众号 h3 + cover 二维码 img + 客户文章链接 h3 块（含 appmsgalbum 链接×1）"
+  preserved: "post-content 的 vendor script 块（vue/index/resultTable/base.js）与容器闭合"
 
 vendor_weixin_album_links:
   before: '<a href="https://mp.weixin.qq.com/mp/appmsgalbum?…">…</a>'

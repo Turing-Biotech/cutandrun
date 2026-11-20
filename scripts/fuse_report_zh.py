@@ -110,7 +110,7 @@ samplesheet 口径（C 组 = 对照，E 组 = 实验，R1–R3 为重复）。</
 <p class="paragraph">
 本小节基于 8-19 生产运行的发布产物重建（work 目录已清理，FRiP 得分、peak 可重复性、
 片段长度分布、线性重复水平、Picard 重复率与软件版本小节不在此报告中，
-见附录「数据口径与缺失登记」）。</p>
+缺失项的完整登记见下方「数据口径与缺失登记」小节）。</p>
 <div class="el-row">
 <div class="el-col-18 el-col-offset-3">
 <div style="width:100%;border:1px solid #d0d7e2;border-radius:6px;overflow:hidden;">
@@ -350,8 +350,29 @@ def _sub(html: str, old: str, new: str, label: str, log: list, force_n: int | No
     return html, True
 
 
+def remove_appendix(html: str, log: list) -> tuple[str, bool]:
+    """Drop the vendor appendix (附录 h1 + 图凌公众号/微信文章链接 h3 品牌块).
+    Ruling 2026-11-19: 交付报告删除附录一节. Cut runs from the 附录 h1 to the
+    vendor's post-content <script> block (which must be preserved)."""
+    m = re.search(r'<h1[^>]*>\s*附录\s*</h1>', html)
+    if not m:
+        log.append("MISS  附录 h1 — nothing removed")
+        return html, False
+    end = html.find('<script src="js/myJs/vue.min.js">', m.end())
+    if end < 0:
+        log.append("MISS  post-appendix script anchor — appendix NOT removed")
+        return html, False
+    html = html[:m.start()] + html[end:]
+    log.append("ok    附录一节整体移除（附录 h1 + 公众号 h3×2）")
+    return html, True
+
+
 def fuse(html: str, terms: dict, args, log: list) -> tuple[str, dict, dict]:
     edits: dict = {}
+
+    # --- appendix removal (first: the weixin/QR strings live inside it) ----
+    html, ok = remove_appendix(html, log)
+    edits["appendix_removed"] = ok
 
     # --- B1 brand text ---------------------------------------------------
     n_brand = html.count(BRAND_FROM)
@@ -367,13 +388,17 @@ def fuse(html: str, terms: dict, args, log: list) -> tuple[str, dict, dict]:
     html, ok = _sub(html, COVER_IMG_TAG, BRAND_IMG_PLACEHOLDER, "cover 图 -> 图凌占位块", log)
     edits["cover"] = ok
 
-    # --- tail QR img -> placeholder (keep the 公众号 heading, drop img) ---
-    html, ok = _sub(html, TAIL_QR_IMG_TAG, BRAND_IMG_PLACEHOLDER, "附录二维码 -> 图凌占位块", log)
+    # --- tail QR img -> placeholder (skip when the appendix is gone) ------
+    ok = False
+    if TAIL_QR_IMG_TAG in html:
+        html, ok = _sub(html, TAIL_QR_IMG_TAG, BRAND_IMG_PLACEHOLDER, "附录二维码 -> 图凌占位块", log)
+    else:
+        log.append("skip  附录二维码（附录已移除）")
     edits["tail_qr"] = ok
 
     # --- vendor WeChat album links ---------------------------------------
     n_w = len(WEIXIN_LINK_RE.findall(html))
-    html = WEIXIN_LINK_RE.sub('<span style="color:#8a94a6;">（图凌公众号文章链接：待定）</span>', html)
+    html = WEIXIN_LINK_RE.sub('<span style="color:#8a94a6;">（图凌官方文章链接：待定）</span>', html)
     log.append(f"ok    vendor 微信链接移除: {n_w}x")
     edits["weixin_links"] = n_w
 
@@ -491,7 +516,9 @@ def verify(outdir: str, log: list) -> int:
             failures.append(label)
 
     heads = re.findall(r"<(h[1-4])\b", html)
-    check("headings >= 40 (39 vendor + 1 MultiQC Section)", len(heads) >= 40, f"got {len(heads)}")
+    check("headings >= 38 (vendor 39 - appendix 3 + 1 MultiQC Section)", len(heads) >= 38, f"got {len(heads)}")
+    check("appendix removed (附录 h1 gone)", not re.search(r'<h1[^>]*>\s*附录\s*</h1>', html))
+    check("appendix brand blocks gone (公众号)", "公众号" not in html)
     check("MultiQC Section present", "标准分析 Section 1.5-质控交互报告（MultiQC 中文版）" in html)
     check("iframe present", "multiqc/multiqc_report.html" in html and "<iframe" in html)
     check("brand 嘉因 == 0", "嘉因" not in html)
